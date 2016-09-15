@@ -19,4 +19,4 @@ equivalentTo:
     text: "%s and ('realized in' some ('disease course' and ('has part' some %s)))"
     vars:
         - disease
-        - biological process
+        - goProcess
