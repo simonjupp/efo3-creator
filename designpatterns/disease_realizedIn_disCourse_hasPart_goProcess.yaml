@@ -2,7 +2,7 @@ pattern_name: disease_realizedIn_disCourse_hasPart_goProcess
 
 classes:
     disease: EFO_0000408
-    goProcess: GO_0008150
+    biological process: GO_0008150
     
 relations:
     realized in: BFO_0000054
