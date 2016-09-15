@@ -15,6 +15,8 @@ relations:
 vars:
     disease: "'disease'"
     location: "'cell type' or 'organism part'"
+    location1: "'cell type' or 'organism part'"
+    location2: "'cell type' or 'organism part'"
     system: "'anatomical system' or 'plant anatomical entity'"
     
 comment:
@@ -32,6 +34,23 @@ equivalentTo:
         - disease
         - location
         - location
+        
+equivalentTo:
+    text: "%s and (has_disease_location some (%s or %s))'
+    vars:
+        - disease
+        - location1
+        - location2
+        
+equivalentTo:
+    text: "%s and (has_disease_location some ((%s or 'part of' some %s) or (%s or 'part of' some %s)));
+    vars:
+        - disease
+        - location1
+        - location1
+        - location2
+        - location2
+        
         
 comment:
     text: "disease has_disease_location a cell type that is located in a system"
