@@ -17,5 +17,5 @@ equivalentTo:
     text: "%s and ('derives from' some %s)"
     vars:
         - child_cell_line
-        - parent_cell_type
+        - parent_cell_line
         
