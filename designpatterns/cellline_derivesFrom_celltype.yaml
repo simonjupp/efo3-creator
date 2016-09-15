@@ -1,0 +1,22 @@
+pattern_name: cellline_derivesFrom_celltype
+
+classes:
+    cell line: EFO_0000322
+    cell type: EFO_0000324
+    
+relations:
+    derives from: RO_0001000
+
+vars:
+    cell_line: "'cell line'"
+    cell_type: "'cell type'"
+    
+comment:
+    text: "This pattern covers cell line (material entity) deriving from cell type (material entity)"
+    
+equivalentTo:
+    text: "%s and ('derives from' some %s)"
+    vars:
+        - cell_line
+        - cell_type
+        

@@ -1,0 +1,23 @@
+pattern_name: celltype_bearerOf_disease
+
+classes:
+    disease: EFO_0000408
+    cell type: EFO_0000324
+    
+relations:
+    bearer of: RO_0000053
+
+vars:
+    cell_type: "'cell type'"
+    disease: "'disease'"
+    
+comment:
+    text: "This pattern covers cell types (material entity - independent continuant) 
+    being a bearer of a disease (disposition - specifically dependent continuant)"
+    
+equivalentTo:
+    text: "%s and ('bearer of' some %s)"
+    vars:
+        - cell_type
+        - disease
+        

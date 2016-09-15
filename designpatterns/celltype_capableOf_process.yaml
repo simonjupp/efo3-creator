@@ -1,0 +1,23 @@
+pattern_name: celltype_capableOf_process
+
+classes:
+    cell type: EFO_0000324
+    process: BFO_0000015
+        
+relations:
+    capable of: RO_0002215
+
+vars:
+    cell_type: "'cell type'"
+    process: "'process'"
+    
+comment:
+    text: "This pattern covers cell types (material entity - independent continuant) 
+    having the ability to carry out a process; biological, or planned."
+    
+equivalentTo:
+    text: "%s and ('capable of' some %s)"
+    vars:
+        - cell_type
+        - process
+        
