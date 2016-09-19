@@ -1,0 +1,20 @@
+pattern_name: experiment_hasParticipant_instrument
+
+classes:
+    experimental process: EFO_0002694
+    instrument: EFO_0000548
+    
+relations:
+    has participant: RO_0000057
+    
+vars:
+    experiment: "'experimental process'"
+    instrument: "instrument"
+    
+comment:
+    text: "process 'has participant' some continuant, this is used in EFO to describe assay by instrument classification"
+    
+equivalentTo:
+    text: "'has participant' some %s"
+    vars:
+        - instrument
