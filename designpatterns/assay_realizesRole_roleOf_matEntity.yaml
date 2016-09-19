@@ -6,7 +6,7 @@ classes:
     material entity: BFO_0000040
     
 relations:
-    realizes: RO_0000055
+    realizes: BFO_0000055
     role of: RO_0000081
     
 vars:
