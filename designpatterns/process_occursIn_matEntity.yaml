@@ -1,0 +1,24 @@
+pattern_name: process_occursIn_matEntity
+
+classes:
+    process: BFO_0000015
+    material entity: BFO_0000040
+        
+relations:
+    occurs in: BFO_0000066
+
+vars:
+    process: "process"
+    matEntity: "'material entity'"
+
+    
+comment:
+    text: "Example of usage: biological process occurs in cellular component, e.g. protein glycosylation
+    in endoplasmic reticulum equivTo 'protein glycosylation' and ('occurs in' some 'endoplasmic reticulum'"
+    
+equivalentTo:
+    text: "%s and ('occurs in' some %s)"
+    vars:
+        - process
+        - matEntity
+        
