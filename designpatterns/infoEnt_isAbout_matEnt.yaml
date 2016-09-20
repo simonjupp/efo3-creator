@@ -12,7 +12,7 @@ vars:
     info: "'information content entity'"
     
 comment:
-    text: "information content entity (IAO_0000030) 'is about' some material entity"
+    text: "information content entity (IAO_0000030) 'is about' some material entity - e.g. measurement is about biomarker"
     
 equivalentTo:
     text: "'is about' some %s"

@@ -1,0 +1,34 @@
+pattern_name: matEntity_inputOf_process_derivesFrom_matEntity
+
+classes:
+    material Entity: BFO_0000040
+    process: BFO_0000015
+    
+relations:
+    input of: RO_0002352
+    derives from: RO_0001000
+
+vars:
+    matEntity1: "'material entity'"
+    matEntity2: "'material entity'"
+    process: "process"
+    
+comment:
+    text: "E.g. - material entity and ('input of' some 'experimental process') and ('derives from' some population)"
+    
+equivalentTo:
+    text: "%s and ('input of' some %s) and ('derives from' some %s)"
+    vars:
+        - matEntity1
+        - process
+        - matEntity2
+        
+
+comment:
+    text: "E.g. - ('input of' some process) and ('derives from' some entity)"
+    
+equivalentTo:
+    text: "('input of' some %s) and ('derives from' some %s)"
+    vars:
+        - process
+        - matEntity1
