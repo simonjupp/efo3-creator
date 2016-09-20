@@ -1,0 +1,31 @@
+pattern_name: matEntity_hasRole_role
+
+classes:
+    role: BFO_0000023
+    
+relations:
+    has role: RO_0000087
+
+vars:
+    role: "role"
+    role1: "role"
+    role2: "role"
+
+    
+comment:
+    text: "independent continuant 'has role' some role - example of usage: drug 'has role' some role"
+    
+equivalentTo:
+    text: "'has role' some %s"
+    vars:
+        - role
+        
+
+comment:
+    text: "x has role some a and some b"
+
+equivalentTo:
+    text: "'has role' some (%s and %s)"
+    vars:
+        - role1
+        - role2

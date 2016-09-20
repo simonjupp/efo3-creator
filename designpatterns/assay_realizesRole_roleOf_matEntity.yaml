@@ -15,7 +15,7 @@ vars:
     entity: "'material entity'"
     
 comment:
-    text: "This design pattern is used to describe assay type of molecule - e.g. dna, rna, proteing [process realizes realizable entity. role 'role of' independent continuant (material entity)]."
+    text: "This design pattern is used to describe assay type of molecule - e.g. dna, rna, protein [process realizes realizable entity. role 'role of' independent continuant (material entity)]."
     
 equivalentTo:
     text: "%s and (realizes some (%s and ('role of' some %s)))"
