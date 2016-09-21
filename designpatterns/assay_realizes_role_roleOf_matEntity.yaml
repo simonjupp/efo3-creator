@@ -1,0 +1,28 @@
+pattern_name: assay_realizes_role_roleOf_matEntity
+
+classes:
+    assay: OBI_0000070
+    role: BFO_0000023
+    material entity: BFO_0000040
+        
+relations:
+    realizes: BFO_0000055
+    role of: RO_0000081
+
+vars:
+    assay: "assay"
+    role: "role"
+    matEntity: "'material entity'"
+
+    
+comment:
+    text: "Example of usage: DNA assay equivTo assay and (realizes some ('analyte role' and
+    ('role of' some DNA)))"
+    
+equivalentTo:
+    text: "%s and (realizes some (%s and ('role of' some %s)))"
+    vars:
+        - assay
+        - role
+        - matEntity
+        

@@ -1,0 +1,54 @@
+pattern_name: disease_realizedIn_disCourse_hasPart_matEntity
+
+classes:
+    disease: EFO_0000408
+    material entity: BFO_0000040
+    disease course: OGMS_0000063
+    cell type: EFO_0000324
+    organism part: EFO_0000635
+    quality: BFO_0000019
+
+    
+relations:
+    realized in: BFO_0000054
+    has part: BFO_0000051
+    has_disease_location: EFO_0000784
+    has quality: RO_0000086
+    
+vars:
+    disease: "'disease'"
+    matEntity: "'material entity'"
+    course: "'disease course'"
+    location: "'cell type' or 'organism part'"
+    quality: "quality"
+    
+comment:
+    text: "BFO's example of usage - this disease is realized in this disease course ||
+    tauopathy equivTo relized_in some ('disease course' and ('has part' some 'microtubule
+    -associated protein tau'"
+    
+equivalentTo:
+    text: "%s and ('realized in' some (%s and ('has part' some %s)))"
+    vars:
+        - disease
+        - course
+        - matEntity
+        
+
+equivalentTo:
+    text: "'realized in' some (%s and ('has part' some %s))"
+    vars:
+        - course
+        - matEntity
+        
+comment:
+    text: "Example of usage: teratozoospermania equivTo 'realized in' some ('disease course'
+    and ('has quality' some abnormal) and (has_disease_location some sperm))"
+    
+equivalentTo:
+    text: "'realized in' some (%s and ('has quality' some %s) and (has_disease_location some
+    %s))"
+    vars:
+        - course
+        - quality
+        - location
