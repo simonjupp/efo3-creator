@@ -11,7 +11,7 @@ classes:
 relations:
     derives from: RO_0001000
     part of: BFO_0000050
-    is model of: RO_0003301
+    is model of: CLO_0000179
 
 vars:
     immortalCellline: "'immortal cell line cell'"
