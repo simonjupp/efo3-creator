@@ -1,0 +1,40 @@
+pattern_name: primaryCellline_by_cellType_and_disease
+
+classes:
+    primary cultured cell: CL_0000001
+    primary cell line: EFO_0003064
+    cell type: EFO_0000324
+    cell: CL_0000000
+    organism part: EFO_0000635
+    organism: OBI_0100026
+    disease: EFO_0000408
+        
+relations:
+    derives from: RO_0001000
+    part of: BFO_0000050
+    is model of: RO_0003301
+
+vars:
+    primaryCellline: "'primary cultured cell' or 'primary cell line'"
+    cell: "'cell type' or cell"
+    organ: "'organism part'"
+    organism: "organism"
+
+    
+comment:
+    text: "A specific cell type derived cell line by disease - CLO pattern. Example of usage:
+    human breast cancer cell line equivTo 'primary cultured cell' and ('derives from' some
+    (cell and ('part of' some ('organism part' and ('part of' some 'Homo sapiens'))))) and
+    ('is model of' some 'breast carcinoma'). ---- NOTE: CLO uses obj.prop. 'is model for'
+    that is in EFO namespace. However, EFO no longer has it - reusing RO's 'is model of'
+    instead."
+    
+equivalentTo:
+    text: "%s and ('derives from' some (%s and ('part of' some (%s and ('part of' some %s)))))
+    and ('is model of' some %s)"
+    vars:
+        - primaryCellline
+        - cellType
+        - organ
+        - organism
+        - disease
