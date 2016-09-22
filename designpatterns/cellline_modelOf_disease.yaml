@@ -6,7 +6,7 @@ classes:
     disease: EFO_0000408
     
 relations:
-    is model of: CLO_0000179
+    is disease model of: CLO_0000179
 
 vars:
     cell_line: "'cell line' or 'cell line cell'"
