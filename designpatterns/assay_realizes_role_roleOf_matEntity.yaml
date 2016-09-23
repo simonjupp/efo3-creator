@@ -26,3 +26,8 @@ equivalentTo:
         - role
         - matEntity
         
+subClassOf:
+    text: "realizes some (%s and ('role of' some %s))"
+    vars:
+        - role
+        - matEntity

@@ -34,6 +34,12 @@ equivalentTo:
         - course
         - matEntity
         
+subClassOf:
+    text: "'realized in' some (%s and ('has part' some %s))"
+    vars:
+        - disease
+        - course
+        - matEntity        
 
 equivalentTo:
     text: "'realized in' some (%s and ('has part' some %s))"
@@ -46,6 +52,14 @@ comment:
     and ('has quality' some abnormal) and (has_disease_location some sperm))"
     
 equivalentTo:
+    text: "'realized in' some (%s and ('has quality' some %s) and (has_disease_location some
+    %s))"
+    vars:
+        - course
+        - quality
+        - location
+        
+subClassOf:
     text: "'realized in' some (%s and ('has quality' some %s) and (has_disease_location some
     %s))"
     vars:

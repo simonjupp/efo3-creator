@@ -38,3 +38,13 @@ equivalentTo:
         - organ
         - organism
         - disease
+        
+    
+subClassOf:
+    text: "('derives from' some (%s and ('part of' some (%s and ('part of' some %s)))))
+    and ('is model of' some %s)"
+    vars:
+        - cellType
+        - organ
+        - organism
+        - disease

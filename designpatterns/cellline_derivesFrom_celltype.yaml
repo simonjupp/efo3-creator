@@ -19,4 +19,8 @@ equivalentTo:
     vars:
         - cell_line
         - cell_type
-        
+
+subClassOf:
+    text: "'derives from' some %s"
+    vars:
+        - cell_type

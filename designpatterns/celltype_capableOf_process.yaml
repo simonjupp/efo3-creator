@@ -21,3 +21,8 @@ equivalentTo:
         - cell_type
         - process
         
+subClassOf:
+    text: "'capable of' some %s"
+    vars:
+        - process
+        

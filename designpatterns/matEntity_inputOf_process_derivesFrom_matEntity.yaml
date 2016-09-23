@@ -23,6 +23,11 @@ equivalentTo:
         - process
         - matEntity2
         
+subClassOf:
+    text: "('input of' some %s) and ('derives from' some %s)"
+    vars:
+        - process
+        - matEntity2
 
 comment:
     text: "E.g. - ('input of' some process) and ('derives from' some entity)"

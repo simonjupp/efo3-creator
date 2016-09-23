@@ -12,7 +12,9 @@ relations:
 vars:
     disease: "disease"
     process: "process"
+    process_: "process"
     quality: "quality"
+    quality_: "quality"
 
     
 comment:
@@ -25,6 +27,27 @@ equivalentTo:
     vars:
         - process
         - quality
+
+subClassOf:
+    text: "'participates in' some (%s and ('has component' some %s))"
+    vars:
+        - process
+        - quality
+        
+comment:
+    text: "Example of usage: 'vitamin deficiency' SubClassOf 'participates in' some (('vitamin metabolic process' and 
+    ('has component' some abnormal)) or ('vitamin transport' and ('has component' some
+    abnormal)))"
+    
+subClassOf:
+    text: "'participates in' some ((%s and ('has component' some %s)) or (%s and ('has component'
+    some %s)))"
+    vars:
+        - process
+        - quality
+        - process_
+        - quality_
+        
         
 
 comment:
@@ -32,6 +55,11 @@ comment:
     glycosylation"
     
 equivalentTo:
+    text: "'participates in' some %s"
+    vars:
+        - process
+        
+subClassOf:
     text: "'participates in' some %s"
     vars:
         - process
@@ -46,4 +74,12 @@ equivalentTo:
     vars:
         - quality
         - process
+        
+subClassOf:
+    text: "('has component' some %s) and ('participates in' some %s)"
+    vars:
+        - quality
+        - process
+
+
     

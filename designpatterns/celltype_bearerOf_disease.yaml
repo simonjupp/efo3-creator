@@ -21,3 +21,8 @@ equivalentTo:
         - cell_type
         - disease
         
+    
+subClassOf:
+    text: "'bearer of' some %s"
+    vars:
+        - disease

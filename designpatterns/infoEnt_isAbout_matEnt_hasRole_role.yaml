@@ -24,3 +24,9 @@ equivalentTo:
         - info
         - entity
         - role
+        
+subClassOf:
+    text: "'is about' some (%s and ('has role' some %s))"
+    vars:
+        - entity
+        - role

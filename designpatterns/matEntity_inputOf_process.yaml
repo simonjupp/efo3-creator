@@ -19,3 +19,8 @@ equivalentTo:
     vars:
         - matEntity
         - process
+        
+subClassOf:
+    text: "'input of' some %s"
+    vars:
+        - process

@@ -23,6 +23,15 @@ equivalentTo:
         - cell_type
         - process
         
+subClassOf:
+    text: "'participates in' some %s"
+    vars:
+        - process
+        
+comment:
+    text: "Example of usage: 'Congenital disorder glycosylation' equivTo 'participates in' some glycosylation.
+    NOTE - this is wrong though, see issue tracker"
+    
 equivalentTo:
     text: "'participates in' some %s"
     vars:

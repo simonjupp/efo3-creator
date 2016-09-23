@@ -29,6 +29,17 @@ equivalentTo:
         - cell_type
         - system
         - system
+        
+subClassOf:
+    text: "'located in' some %s"
+    vars:
+        - system
+
+subClassOf:
+    text: "'located in' some (%s or 'part of' some %s)"
+    vars:
+        - system
+        - system
 
 comment:
     text: "a generic cell type may be located in more than one system, e.g. reproductive system cell can be either animal or plant"
@@ -37,5 +48,12 @@ equivalentTo:
     text: "%s and ('located in' some (%s or %s))"
     vars:
         - cell_type
+        - system
+        - system
+        
+    
+subClassOf:
+    text: "'located in' some (%s or %s)"
+    vars:
         - system
         - system

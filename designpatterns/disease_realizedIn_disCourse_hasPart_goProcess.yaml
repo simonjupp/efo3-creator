@@ -23,3 +23,9 @@ equivalentTo:
         - disease
         - course
         - goProcess
+        
+subClassOf:
+    text: "'realized in' some (%s and ('has part' some %s))"
+    vars:
+        - course
+        - goProcess

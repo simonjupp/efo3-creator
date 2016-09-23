@@ -23,3 +23,10 @@ equivalentTo:
         - assay
         - role
         - entity
+        
+    
+subClassOf:
+    text: "realizes some (%s and ('role of' some %s))"
+    vars:
+        - role
+        - entity

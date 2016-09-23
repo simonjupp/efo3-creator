@@ -29,3 +29,11 @@ equivalentTo:
         - cellType
         - organ
         - organism
+        
+        
+subClassOf:
+    text: "('derives from' some (%s and ('part of' some (%s and ('part of' some %s)))))"
+    vars:
+        - cellType
+        - organ
+        - organism

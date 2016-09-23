@@ -18,7 +18,11 @@ equivalentTo:
     text: "'is about' some %s"
     vars:
         - entity
-        
+
+subClassOf:
+    text: "'is about' some %s"
+    vars:
+        - entity
         
 comment:
     text: "information entity and 'is about' some material entity"
@@ -28,4 +32,5 @@ equivalentTo:
     vars:
         - info
         - entity
+        
         

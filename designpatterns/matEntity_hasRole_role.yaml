@@ -20,11 +20,22 @@ equivalentTo:
     vars:
         - role
         
+subClassOf:
+    text: "'has role' some %s"
+    vars:
+        - role
+        
 
 comment:
     text: "x has role some a and some b"
 
 equivalentTo:
+    text: "'has role' some (%s and %s)"
+    vars:
+        - role1
+        - role2
+        
+subClassOf:
     text: "'has role' some (%s and %s)"
     vars:
         - role1

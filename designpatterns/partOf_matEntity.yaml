@@ -25,6 +25,12 @@ equivalentTo:
     vars:
         - matEntity
         
+subClassOf:
+    text: "'part of' some %s"
+    vars:
+        - matEntity
+        
+        
 comment:
     text: "Example of usage: bronchial smooth muscle cell equivTo 'smooth muscle cell' and ('part of' some bronchus)"
     
@@ -32,4 +38,9 @@ equivalentTo:
     text: "%s and ('part of' some %s)"
     vars:
         - cell
+        - organ
+        
+subClassOf:
+    text: "'part of' some %s"
+    vars:
         - organ

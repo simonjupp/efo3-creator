@@ -22,6 +22,11 @@ equivalentTo:
         - process
         - matEntity
         
+subClassOf:
+    text: "'occurs in' some %s"
+    vars:
+        - matEntity
+        
 comment:
     text: "Example of usage: 'vaginal inflammation' equivTo 'occurs in' some vagina)"
     

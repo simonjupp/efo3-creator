@@ -16,3 +16,8 @@ equivalentTo:
     text: "has_flag some %s"
     vars:
         - flag
+        
+subClassOf:
+    text: "has_flag some %s"
+    vars:
+        - flag

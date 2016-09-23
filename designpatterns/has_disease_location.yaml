@@ -36,16 +36,41 @@ equivalentTo:
         - location
         
 equivalentTo:
-    text: "%s and (has_disease_location some (%s or %s))'
+    text: "%s and (has_disease_location some (%s or %s))"
     vars:
         - disease
         - location1
         - location2
         
 equivalentTo:
-    text: "%s and (has_disease_location some ((%s or 'part of' some %s) or (%s or 'part of' some %s)));
+    text: "%s and (has_disease_location some ((%s or 'part of' some %s) or (%s or 'part of' some %s)))"
     vars:
         - disease
+        - location1
+        - location1
+        - location2
+        - location2
+        
+subClassOf:
+    text: "has_disease_location some %s"
+    vars:
+        - location
+        
+subClassOf:
+    text: "has_disease_location some (%s or ('part of' some %s))"
+    vars:
+        - location
+        - location
+        
+subClassOf:
+    text: "has_disease_location some (%s or %s)"
+    vars:
+        - location1
+        - location2
+        
+subClassOf:
+    text: "has_disease_location some ((%s or 'part of' some %s) or (%s or 'part of' some %s))"
+    vars:
         - location1
         - location1
         - location2
@@ -66,6 +91,20 @@ equivalentTo:
     text: "%s and (has_disease_location some ((%s or ('part of' some %s)) and 'located in' %s))"
     vars:
         - disease
+        - location
+        - location
+        - system
+
+
+subClassOf:
+    text: "has_disease_location some (%s and 'located in' %s)"
+    vars:
+        - location
+        - system
+
+subClassOf:
+    text: "has_disease_location some ((%s or ('part of' some %s)) and 'located in' %s)"
+    vars:
         - location
         - location
         - system

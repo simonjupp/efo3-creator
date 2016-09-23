@@ -13,8 +13,19 @@ vars:
     
 comment:
     text: "process 'has participant' some continuant, this is used in EFO to describe assay by instrument classification"
-    
+
+comment:
+    text: "'assay by sequencer' equivTo 'has participant' some sequencer"
+       
 equivalentTo:
+    text: "'has participant' some %s"
+    vars:
+        - instrument
+
+comment:
+    text: "'Capture-C SubClassOf 'has participant' some sequencer"
+            
+subClassOf:
     text: "'has participant' some %s"
     vars:
         - instrument
