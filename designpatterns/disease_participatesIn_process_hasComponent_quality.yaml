@@ -1,0 +1,85 @@
+pattern_name: disease_participatesIn_process_hasComponent_quality
+
+classes:
+    disease: EFO_0000408
+    process: BFO_0000015
+    quality: BFO_0000019
+            
+relations:
+    'participates in': RO_0000056
+    'has component': RO_0002180
+
+vars:
+    disease: "disease"
+    process: "process"
+    process_: "process"
+    quality: "quality"
+    quality_: "quality"
+
+    
+comment:
+    text: "Need examination on domain-range of 'has component'
+    Example of usage: vitamin metabolic disorder equivTo 'participates in' some 
+    ('vitamin metabolic process' and ('has component' some abnormal))"
+    
+equivalentTo:
+    text: "'participates in' some (%s and ('has component' some %s))"
+    vars:
+        - process
+        - quality
+
+subClassOf:
+    text: "'participates in' some (%s and ('has component' some %s))"
+    vars:
+        - process
+        - quality
+        
+comment:
+    text: "Example of usage: 'vitamin deficiency' SubClassOf 'participates in' some (('vitamin metabolic process' and 
+    ('has component' some abnormal)) or ('vitamin transport' and ('has component' some
+    abnormal)))"
+    
+subClassOf:
+    text: "'participates in' some ((%s and ('has component' some %s)) or (%s and ('has component'
+    some %s)))"
+    vars:
+        - process
+        - quality
+        - process_
+        - quality_
+        
+        
+
+comment:
+    text: "Example of usage: congenital disorder of glycosylation equivTo participates in 
+    glycosylation"
+    
+equivalentTo:
+    text: "'participates in' some %s"
+    vars:
+        - process
+        
+subClassOf:
+    text: "'participates in' some %s"
+    vars:
+        - process
+        
+
+comment:
+    text: "Examples of usage: carbohydrate metabolic disorder equivTo ('has component' some
+    abnormal) and ('participates in' some 'carbohydrate metabolic process')"
+    
+equivalentTo:
+    text: "('has component' some %s) and ('participates in' some %s)"
+    vars:
+        - quality
+        - process
+        
+subClassOf:
+    text: "('has component' some %s) and ('participates in' some %s)"
+    vars:
+        - quality
+        - process
+
+
+    

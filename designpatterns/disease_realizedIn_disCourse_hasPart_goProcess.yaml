@@ -1,0 +1,31 @@
+pattern_name: disease_realizedIn_disCourse_hasPart_goProcess
+
+classes:
+    disease: EFO_0000408
+    disease course: OGMS_0000063
+    biological process: GO_0008150
+    
+relations:
+    realized in: BFO_0000054
+    has part: BFO_0000051
+    
+vars:
+    disease: "'disease'"
+    course: "'disease course'"
+    goProcess: "'biological process'"
+    
+comment:
+    text: "BFO's example of usage - this disease is realized in this disease course"
+    
+equivalentTo:
+    text: "%s and ('realized in' some (%s and ('has part' some %s)))"
+    vars:
+        - disease
+        - course
+        - goProcess
+        
+subClassOf:
+    text: "'realized in' some (%s and ('has part' some %s))"
+    vars:
+        - course
+        - goProcess

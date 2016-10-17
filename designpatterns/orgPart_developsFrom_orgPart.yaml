@@ -1,0 +1,25 @@
+pattern_name: orgPart_developsFrom_orgPart
+
+classes:
+    organism part: EFO_0000635
+    
+relations:
+    develops from: RO_0002202
+
+vars:
+    parent_part: "'organism part'"
+    child_part: "'organism part'"
+    
+comment:
+    text: "This pattern covers child organism part (material entity) developing from parent organism part (material entity)"
+    
+equivalentTo:
+    text: "%s and ('develops from' some %s)"
+    vars:
+        - child_part
+        - parent_part
+        
+subClassOf:
+    text: "'develops from' some %s"
+    vars:
+        - parent_part

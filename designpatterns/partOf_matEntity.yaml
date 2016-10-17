@@ -1,0 +1,46 @@
+pattern_name: partOf_matEntity
+
+classes:
+    material entity: BFO_0000040
+    organism part: EFO_0000635
+    plant component: EFO_0000789
+    plant anatomical entity: PO_0025131
+    plant cell: PO_0009002
+    cell type: EFO_0000324
+        
+relations:
+    part of: BFO_0000050
+
+vars:
+    matEntity: "'material entity'"
+    cell: "'cell type' or 'plant cell'"
+    organ: "'organism part' or 'plant component' or 'plant anatomical entity'"
+
+    
+comment:
+    text: "Example of usage: blood component equivTo part_of some blood"
+    
+equivalentTo:
+    text: "'part of' some %s"
+    vars:
+        - matEntity
+        
+subClassOf:
+    text: "'part of' some %s"
+    vars:
+        - matEntity
+        
+        
+comment:
+    text: "Example of usage: bronchial smooth muscle cell equivTo 'smooth muscle cell' and ('part of' some bronchus)"
+    
+equivalentTo:
+    text: "%s and ('part of' some %s)"
+    vars:
+        - cell
+        - organ
+        
+subClassOf:
+    text: "'part of' some %s"
+    vars:
+        - organ

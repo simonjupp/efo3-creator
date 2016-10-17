@@ -1,0 +1,27 @@
+pattern_name: cellline_modelOf_disease
+
+classes:
+    cell line: EFO_0000322
+    cell line cell: CLO_0000001
+    disease: EFO_0000408
+    
+relations:
+    is disease model of: CLO_0000179
+
+vars:
+    cell_line: "'cell line' or 'cell line cell'"
+    disease: "disease"
+    
+comment:
+    text: "This pattern covers cell line classification by disease"
+    
+equivalentTo:
+    text: "%s and ('is model of' some %s)"
+    vars:
+        - cell_line
+        - disease
+        
+subClassOf:
+    text: "'is model of' some %s"
+    vars:
+        - disease

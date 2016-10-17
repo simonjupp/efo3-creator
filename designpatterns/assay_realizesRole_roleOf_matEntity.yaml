@@ -1,0 +1,32 @@
+pattern_name: assay_realizesRole_roleOf_matEntity
+
+classes:
+    assay: OBI_0000070
+    role: BFO_0000023
+    material entity: BFO_0000040
+    
+relations:
+    realizes: BFO_0000055
+    role of: RO_0000081
+    
+vars:
+    assay: "assay"
+    role: "role"
+    entity: "'material entity'"
+    
+comment:
+    text: "This design pattern is used to describe assay type of molecule - e.g. dna, rna, protein [process realizes realizable entity. role 'role of' independent continuant (material entity)]."
+    
+equivalentTo:
+    text: "%s and (realizes some (%s and ('role of' some %s)))"
+    vars:
+        - assay
+        - role
+        - entity
+        
+    
+subClassOf:
+    text: "realizes some (%s and ('role of' some %s))"
+    vars:
+        - role
+        - entity

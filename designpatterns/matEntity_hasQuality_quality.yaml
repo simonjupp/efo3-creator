@@ -1,0 +1,41 @@
+pattern_name: matEntity_hasQuality_quality
+
+classes:
+    quality: BFO_0000019
+    
+relations:
+    has quality: RO_0000086
+
+vars:
+    quality: "quality"
+    quality1: "quality"
+    quality2: "quality"
+
+    
+comment:
+    text: "independent continuant 'has quality' some quality - example of usage: 'inbred Mus musculus strain' has quality inbred"
+    
+equivalentTo:
+    text: "'has quality' some %s"
+    vars:
+        - quality
+       
+subClassOf:
+    text: "'has quality' some %s"
+    vars:
+        - quality 
+
+comment:
+    text: "x has quality some a and some b"
+
+equivalentTo:
+    text: "'has quality' some (%s and %s)"
+    vars:
+        - quality1
+        - quality2
+        
+subClassOf:
+    text: "'has quality' some (%s and %s)"
+    vars:
+        - quality1
+        - quality2

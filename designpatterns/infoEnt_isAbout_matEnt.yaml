@@ -1,0 +1,36 @@
+pattern_name: infoEnt_isAbout_matEnt
+
+classes:
+    information content entity: IAO_0000030
+    material entity: BFO_0000040
+    
+relations:
+    is about: IAO_0000136
+
+vars:
+    entity: "'material entity'"
+    info: "'information content entity'"
+    
+comment:
+    text: "information content entity (IAO_0000030) 'is about' some material entity - e.g. measurement is about biomarker"
+    
+equivalentTo:
+    text: "'is about' some %s"
+    vars:
+        - entity
+
+subClassOf:
+    text: "'is about' some %s"
+    vars:
+        - entity
+        
+comment:
+    text: "information entity and 'is about' some material entity"
+    
+equivalentTo:
+    text: "%s and ('is about' some %s)"
+    vars:
+        - info
+        - entity
+        
+        

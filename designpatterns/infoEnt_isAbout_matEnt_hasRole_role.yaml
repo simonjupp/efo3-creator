@@ -1,0 +1,32 @@
+pattern_name: infoEnt_isAbout_matEnt_hasRole_role
+
+classes:
+    information content entity: IAO_0000030
+    material entity: BFO_0000040
+    role: BFO_0000023
+    
+relations:
+    is about: IAO_0000136
+    has role: RO_0000087
+
+vars:
+    entity: "'material entity'"
+    info: "'information content entity'"
+    role: "role"
+    
+comment:
+    text: "information content entity (IAO_0000030) 'is about' some material entity that 'has role' some role - 
+    e.g. iron biomarker measurement equiv to measurement and (is_about some (iron and (has_role some biomarker)))"
+    
+equivalentTo:
+    text: "%s and ('is about' some (%s and ('has role' some %s)))"
+    vars:
+        - info
+        - entity
+        - role
+        
+subClassOf:
+    text: "'is about' some (%s and ('has role' some %s))"
+    vars:
+        - entity
+        - role

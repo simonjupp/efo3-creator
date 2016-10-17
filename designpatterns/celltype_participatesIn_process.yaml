@@ -1,0 +1,39 @@
+pattern_name: celltype_participatesIn_process
+
+classes:
+    cell type: EFO_0000324
+    plant cell: PO_0009002
+    process: BFO_0000015
+
+    
+relations:
+    participates in: RO_0000056
+
+vars:
+    cell_type: "'cell type' or 'plant tell'"
+    process: "process"
+    
+comment:
+    text: "Example of usage: experimental cell equivTo 'cell type' and ('participates in' some
+    'experimental process')."
+    
+equivalentTo:
+    text: "%s and ('participates in' some %s)"
+    vars:
+        - cell_type
+        - process
+        
+subClassOf:
+    text: "'participates in' some %s"
+    vars:
+        - process
+        
+comment:
+    text: "Example of usage: 'Congenital disorder glycosylation' equivTo 'participates in' some glycosylation.
+    NOTE - this is wrong though, see issue tracker"
+    
+equivalentTo:
+    text: "'participates in' some %s"
+    vars:
+        - process
+    

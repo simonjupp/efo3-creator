@@ -1,0 +1,26 @@
+pattern_name: matEntity_inputOf_process
+
+classes:
+    material entity: BFO_0000040
+    process: BFO_0000015
+    
+relations:
+    input of: RO_0002352
+
+vars:
+    matEntity: "'material entity'"
+    process: "process"
+    
+comment:
+    text: "Example of usage HapMap cell line equivTo 'cell line' and ('input of' some 'HapMap haplotype mapping')"
+    
+equivalentTo:
+    text: "%s and ('input of' some %s)"
+    vars:
+        - matEntity
+        - process
+        
+subClassOf:
+    text: "'input of' some %s"
+    vars:
+        - process

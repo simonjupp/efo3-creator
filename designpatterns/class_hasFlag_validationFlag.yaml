@@ -1,0 +1,23 @@
+pattern_name: class_hasFlag_validationFlag
+
+classes:
+    validation flag: EFO_0004110
+    
+relations:
+    has_flag: http://www.ebi.ac.uk/efo/has_flag
+    
+vars:
+    flag: "'validation flag'"
+    
+comment:
+    text: "this relationship is still used by Atlas curators as of August 2016"
+    
+equivalentTo:
+    text: "has_flag some %s"
+    vars:
+        - flag
+        
+subClassOf:
+    text: "has_flag some %s"
+    vars:
+        - flag
