@@ -1,64 +1,67 @@
 package uk.ac.ebi.spot.legacy;
 
-import org.apache.commons.io.FileUtils;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.util.OWLOntologyURIChanger;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
-import uk.ac.ebi.spot.ModuleProfileExtractor;
-import uk.ac.ebi.spot.ontobuilder.OntologyBuilder;
 import uk.ac.ebi.spot.ontobuilder.OntologyConfiguration;
+import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
+import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Simon Jupp
- * @date 06/01/2016
+ * @date 14/10/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 public class ModuleExtractor {
 
     private SimpleShortFormProvider simpleShortFormProvider = new SimpleShortFormProvider();
-    private String slimBase = "/Users/jupp/dev/java/efo3-creator/efo/src/imported-terms";
-    public ModuleExtractor(OWLOntology owlOntology, Collection<OntologyConfiguration> configurations) {
 
+    public Set<OWLAxiom> getExternalAxioms (OWLOntology owlOntology, Collection<OntologyConfiguration> configurations) {
 
+        Set<OWLAxiom> owlAxioms = new HashSet<>();
 
+        OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
         for (OntologyConfiguration ontologyConfiguration : configurations) {
 
-            try {
+            if (ontologyConfiguration.getShortName().equals("uberon")) {
+                try {
 
-                Set<IRI> signature = getEntitiesByPrefix(owlOntology, ontologyConfiguration.getIdPrefix(), ontologyConfiguration.getPrefix());
 
-                String slimdir = slimBase + File.separator + ontologyConfiguration.getShortName();
-                FileUtils.deleteDirectory(new File(slimdir));
-                FileUtils.forceMkdir(new File(slimdir));
-                PrintWriter writer = new PrintWriter(new File(slimdir + File.separator + ontologyConfiguration.getShortName() + ".txt"), "UTF-8");
-                for (IRI term : signature) {
-                    writer.println(term.toString() + "\t" + getLabel(owlOntology.getOWLOntologyManager().getOWLDataFactory().getOWLClass(term), owlOntology));
+                    Set<IRI> iris = getEntitiesByPrefix(owlOntology, ontologyConfiguration.getIdPrefix(), ontologyConfiguration.getPrefix());
+
+                    System.out.println("Loading " + ontologyConfiguration.getOntologyIri() + " for extraction" );
+                    OWLOntology moduleOntology = manager.loadOntology(ontologyConfiguration.getOntologyUrl());
+
+                    Set<OWLEntity> signature = new HashSet<>();
+                    for (IRI iri : iris) {
+                        signature.add(dataFactory.getOWLClass(iri));
+                    }
+
+                    SyntacticLocalityModuleExtractor moduleExtractor = new SyntacticLocalityModuleExtractor(manager, moduleOntology, ModuleType.TOP);
+
+
+                    owlAxioms = moduleExtractor.extract(signature);
+                    System.out.println(owlAxioms);
+
                 }
-                writer.close();
+                catch (OWLOntologyCreationException e) {
+                    e.printStackTrace();
+                }
 
-            } catch (IOException e) {
-                e.printStackTrace();
             }
 
         }
 
-    }
 
-    private String getLabel(OWLEntity entity, OWLOntology owlOntology) {
-       for (OWLAnnotation annotation:  entity.getAnnotations(owlOntology)) {
-           if (annotation.getProperty().isLabel())  {
-               return ( (OWLLiteral) annotation.getValue()).getLiteral().toString();
-           }
-       }
-        return simpleShortFormProvider.getShortForm(entity);
 
-    }
+
+    return owlAxioms;
+
+}
 
     private Set<IRI> getEntitiesByPrefix(OWLOntology owlOntology, String idPrefix, String prefix) {
 
@@ -78,4 +81,5 @@ public class ModuleExtractor {
         }
         return iris;
     }
+
 }
