@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.legacy;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.util.OWLEntityRenamer;
 import org.semanticweb.owlapi.util.OWLOntologyMerger;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 import uk.ac.ebi.spot.ontobuilder.ConfigParser;
@@ -42,27 +43,59 @@ public class EFOModuleExtractor {
             manager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp//dev/ontologies/ExperimentalFactorOntology/ExFactorInOWL/releasecandidate/efo_ordo_module.owl"));
             manager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp//dev/ontologies/ExperimentalFactorOntology/ExFactorInOWL/releasecandidate/efo_release_candidate.owl"));
 
-
+//            manager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp/dev/java/efo3-creator/efo-dev/releasecandidate/efoDiseaseAxioms.owl"));
+//            manager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp/dev/java/efo3-creator/efo-dev/releasecandidate/efoordoaxioms.owl"));
+//            manager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp/dev/java/efo3-creator/efo-dev/releasecandidate/efo_disease_module.owl"));
+//            manager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp/dev/java/efo3-creator/efo-dev/releasecandidate/efo_ordo_module.owl"));
+//            manager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp/dev/java/efo3-creator/efo-dev/releasecandidate/efo_release_candidate.owl"));
             // merge to create single ontology
-            OWLOntologyMerger merger = new OWLOntologyMerger(manager);
+            OWLOntologyMerger merger = new OWLOntologyMerger(manager, false);
             OWLOntology merged = merger.createMergedOntology(manager, IRI.create("http://www.ebi.ac.uk/efo-merged")) ;
+
 //            OntologyConfiguration patoConfig = new OntologyConfiguration(
 //                    "pato", IRI.create("http://purl.obolibrary.org/obo/pato.owl"), IRI.create("http://purl.obolibrary.org/obo/pato.owl"), "PATO_");
 
             // dump the terms from EFO into a text file
-            TermDumper termDumper = new TermDumper(merged, ontologyConfigurations);
+            TermDumper termDumper = new TermDumper();
+            for (OntologyConfiguration configuration : ontologyConfigurations) {
+                // we don't want to dump ordo - we are managing that list ourselves now
+                if (!configuration.getShortName().equals("ordo")) {
+                    termDumper.dumpTerms(merged, configuration);
+                }
+            }
 
             // remove any non EFO axioms (i.e. axioms that come from an external ontology)
 
             ModuleExtractor moduleExtractor = new ModuleExtractor();
             Set<OWLAxiom> externalAxioms = moduleExtractor.getExternalAxioms(merged, ontologyConfigurations);
 
+            // sometimes EFO terms have made it into external ontologies... any axioms about these terms like a label, shouldn't be removed
+
+            Set<OWLAxiom> externalAxiomsToKeep = new HashSet<>();
+            for (OWLAxiom externalAxiom : externalAxioms)
+            {
+                if (externalAxiom instanceof  OWLAnnotationAssertionAxiom) {
+                    OWLAnnotationAssertionAxiom annotationAssertionAxiom = (OWLAnnotationAssertionAxiom) externalAxiom ;
+                    if (annotationAssertionAxiom.getSubject() instanceof  IRI) {
+                        if ( ( (IRI) annotationAssertionAxiom.getSubject()).toString().startsWith("http://www.ebi.ac.uk/efo/EFO_")) {
+                            externalAxiomsToKeep.add(externalAxiom);
+                        }
+                    }
+                }
+                for (OWLClass owlClass : externalAxiom.getClassesInSignature()) {
+                    if (owlClass.getIRI().toString().startsWith("http://www.ebi.ac.uk/efo/EFO_")) {
+                        externalAxiomsToKeep.add(externalAxiom);
+                    }
+                }
+            }
+
+            externalAxioms.removeAll(externalAxiomsToKeep);
 
             List<OWLOntologyChange> changes = manager.removeAxioms(merged, externalAxioms);
 
-            for (OWLOntologyChange change : changes) {
-                System.out.println(change.toString());
-            }
+//            for (OWLOntologyChange change : changes) {
+//                System.out.println(change.toString());
+//            }
 
             // remove any non EFO subclass axioms between named classes. subclasses we may have created
 
@@ -88,11 +121,7 @@ public class EFOModuleExtractor {
                     String sup = simpleShortFormProvider.getShortForm(superclass.asOWLClass())  ;
 
                     // keep any axioms involving orphanet terms
-                    if (sub.startsWith("Orphanet_") || sup.startsWith("Orphanet_")) {
-                    }
-                    else if (!sub.startsWith("EFO_") && !sup.startsWith("EFO_")) {
-                        System.out.println("Removing axiom that shouldn't be in EFO" + axiom.toString());
-
+                    if (!sub.startsWith("EFO_") && !sup.startsWith("EFO_")) {
                         axiomsToRemove.add(new RemoveAxiom(merged, axiom));
                     }
 

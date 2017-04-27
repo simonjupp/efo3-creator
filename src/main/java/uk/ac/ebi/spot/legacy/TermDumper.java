@@ -28,12 +28,13 @@ public class TermDumper {
 
     private SimpleShortFormProvider simpleShortFormProvider = new SimpleShortFormProvider();
     private String slimBase = "/Users/jupp/dev/java/efo3-creator/efo/src/imported-terms";
-    public TermDumper(OWLOntology owlOntology, Collection<OntologyConfiguration> configurations) {
+    public TermDumper() {
 
+    }
 
+    public void dumpTerms(OWLOntology owlOntology, Collection<OntologyConfiguration> ontologyConfigurations) {
 
-        for (OntologyConfiguration ontologyConfiguration : configurations) {
-
+        for (OntologyConfiguration ontologyConfiguration : ontologyConfigurations) {
             try {
 
                 Set<IRI> signature = getEntitiesByPrefix(owlOntology, ontologyConfiguration.getIdPrefix(), ontologyConfiguration.getPrefix());
@@ -50,17 +51,35 @@ public class TermDumper {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
+    }
 
+    public void dumpTerms(OWLOntology owlOntology, OntologyConfiguration ontologyConfiguration) {
+
+        try {
+
+            Set<IRI> signature = getEntitiesByPrefix(owlOntology, ontologyConfiguration.getIdPrefix(), ontologyConfiguration.getPrefix());
+
+            String slimdir = slimBase + File.separator + ontologyConfiguration.getShortName();
+            FileUtils.deleteDirectory(new File(slimdir));
+            FileUtils.forceMkdir(new File(slimdir));
+            PrintWriter writer = new PrintWriter(new File(slimdir + File.separator + ontologyConfiguration.getShortName() + ".txt"), "UTF-8");
+            for (IRI term : signature) {
+                writer.println(term.toString() + "\t" + getLabel(owlOntology.getOWLOntologyManager().getOWLDataFactory().getOWLClass(term), owlOntology));
+            }
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getLabel(OWLEntity entity, OWLOntology owlOntology) {
-       for (OWLAnnotation annotation:  entity.getAnnotations(owlOntology)) {
-           if (annotation.getProperty().isLabel())  {
-               return ( (OWLLiteral) annotation.getValue()).getLiteral().toString();
-           }
-       }
+        for (OWLAnnotation annotation:  entity.getAnnotations(owlOntology)) {
+            if (annotation.getProperty().isLabel())  {
+                return ( (OWLLiteral) annotation.getValue()).getLiteral().toString();
+            }
+        }
         return simpleShortFormProvider.getShortForm(entity);
 
     }

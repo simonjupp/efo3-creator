@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.ontobuilder;
 
 import org.apache.commons.io.FileUtils;
 import org.semanticweb.HermiT.Reasoner;
+import org.semanticweb.HermiT.structural.OWLAxioms;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
 import org.semanticweb.owlapi.model.*;
@@ -101,10 +102,13 @@ public class OntologyBuilder {
         }
 
         String fixesDirPath = baseDir + File.separator + "fixes";
-        File fixesFile = new File(fixesDirPath, "subClasses.txt");
+
+        // add new subclass axioms required for fixing
+
+        File newSubclassesFile = new File(fixesDirPath, "subClasses.txt");
 
         try {
-            Scanner fileReader = new Scanner(fixesFile);
+            Scanner fileReader = new Scanner(newSubclassesFile);
             while (fileReader.hasNext()) {
                 String line = fileReader.nextLine();
                 String []lineSplit = line.split("\\s+");
@@ -113,7 +117,7 @@ public class OntologyBuilder {
                 OWLAxiom subclass= manager.getOWLDataFactory().getOWLSubClassOfAxiom(
                         manager.getOWLDataFactory().getOWLClass(IRI.create(sub)),
                         manager.getOWLDataFactory().getOWLClass(IRI.create(sup))
-                        );
+                );
                 manager.applyChange(new AddAxiom(sourceOntology, subclass));
             }
 
@@ -151,9 +155,6 @@ public class OntologyBuilder {
 
             for (OWLClass cls : mergedOntology.getClassesInSignature()) {
 
-                if (cls.getIRI().toString().equals("http://purl.obolibrary.org/obo/UBERON_0001135"))  {
-                    System.out.println("yo");
-                }
                 boolean isUnderRoot = false;
                 for (IRI iri : roots)  {
                     OWLClass root = manager.getOWLDataFactory().getOWLClass(iri);
@@ -163,20 +164,28 @@ public class OntologyBuilder {
                 }
                 if (!isUnderRoot) {
 
-                    if (allSlimTerms.contains(cls.getIRI())) {
-                        log.warn("Removing a slim term: " + cls.getIRI());
-//                        for (OWLClassExpression exp: cls.getSuperClasses(mergedOntology)) {
-//                            if (!exp.isAnonymous()) {
-//                                if (exp instanceof OWLClass) {
-//                                    OWLAxiom subclass= manager.getOWLDataFactory().getOWLSubClassOfAxiom(cls, exp);
-//                                    manager.applyChange(new AddAxiom(mergedOntology, subclass));
-//                                }
-//                            }
-//                        }
+                    // if it's ordo add it back under genetic disorder
+                    if (cls.getIRI().getFragment().startsWith("Orphanet_") && allSlimTerms.contains(cls.getIRI())) {
+                        OWLSubClassOfAxiom subClassOfAxiom = manager.getOWLDataFactory().getOWLSubClassOfAxiom(
+                                manager.getOWLDataFactory().getOWLClass(cls.getIRI()),
+                                manager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ebi.ac.uk/efo/EFO_0000508"))
+                        );
+                        manager.addAxiom(mergedOntology, subClassOfAxiom);
+//                        log.info("Adding Orphanet term back as sublass of genetic disorder");
+                    } else if (cls.getIRI().getFragment().startsWith("UBERON_") && allSlimTerms.contains(cls.getIRI())) {
+                        OWLSubClassOfAxiom subClassOfAxiom = manager.getOWLDataFactory().getOWLSubClassOfAxiom(
+                                manager.getOWLDataFactory().getOWLClass(cls.getIRI()),
+                                manager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ebi.ac.uk/efo/EFO_0000787"))
+                        );
+                        manager.addAxiom(mergedOntology, subClassOfAxiom);
+//                        log.info("Adding UBERON term back as sublass of animal component");
                     }
-//                    else {
-                    owlEntityRemover.visit(cls);
-//                    }
+                    else if (allSlimTerms.contains(cls.getIRI())){
+                        log.warn("Removing a slim term: " + cls.getIRI());
+                        owlEntityRemover.visit(cls);
+                    } else {
+                        owlEntityRemover.visit(cls);
+                    }
 
                 }
             }
@@ -262,7 +271,7 @@ public class OntologyBuilder {
                 // save the file
                 File output = new File( ontoDir, ontologyConfiguration.getShortName() + ".owl");
                 extractedManager.saveOntology(extractedModule, IRI.create(output));
-                manager.loadOntology(IRI.create(output));
+//                manager.loadOntology(IRI.create(output));
 
                 log.info("Mireot created for " + ontologyConfiguration.getShortName() + " in " + output);
 
@@ -270,8 +279,6 @@ public class OntologyBuilder {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (OWLOntologyStorageException e) {
-                e.printStackTrace();
-            } catch (OWLOntologyCreationException e) {
                 e.printStackTrace();
             }
         }
@@ -292,13 +299,49 @@ public class OntologyBuilder {
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         manager.setSilentMissingImportsHandling(true);
 
+        // merge ontologies into single ontology for mireot extraction
         try {
+
             manager.loadOntology(location);
+
+            IRI mergedOntologyIri = IRI.create(iri.toString() + "-merged");
+
+            OWLOntologyMerger owlOntologyMerger = new OWLOntologyMerger(manager);
+            OWLOntology mergedOntology = owlOntologyMerger.createMergedOntology(manager,mergedOntologyIri );
+            if (iri.toString().contains("orphanet")) {
+
+                // swap part_of for is-a
+                Set<OWLAxiom> partOfAxioms = manager.getOntology(mergedOntologyIri).getReferencingAxioms(manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://purl.obolibrary.org/obo/BFO_0000050")));
+
+                Set<OWLAxiom> axiomToRemove = new HashSet<>();
+                Set<OWLAxiom> axiomToAdd = new HashSet<>();
+                for (OWLAxiom ax : partOfAxioms) {
+                    if (ax instanceof OWLSubClassOfAxiom) {
+                        OWLSubClassOfAxiom partOfSomeAxiom = (OWLSubClassOfAxiom) ax;
+                        if (partOfSomeAxiom.getSuperClass() instanceof OWLObjectSomeValuesFrom) {
+                            OWLObjectSomeValuesFrom someRestriction = (OWLObjectSomeValuesFrom) partOfSomeAxiom.getSuperClass();
+                            if (someRestriction.getFiller() instanceof OWLClass) {
+                                axiomToRemove.add(ax);
+                                axiomToAdd.add(manager.getOWLDataFactory().getOWLSubClassOfAxiom(
+                                        partOfSomeAxiom.getSubClass().asOWLClass(),
+                                        someRestriction.getFiller().asOWLClass()
+                                ));
+                            }
+                        }
+                    }
+                }
+
+                manager.removeAxioms(mergedOntology, axiomToRemove);
+                manager.addAxioms(mergedOntology, axiomToAdd);
+
+
+            }
+
 
             OWLOntology ontology =  moduleExtractor.getMireotFull(
                     signature,
                     manager,
-                    Collections.singleton(iri)
+                    Collections.singleton(mergedOntologyIri)
             );
 
 
@@ -324,11 +367,11 @@ public class OntologyBuilder {
     }
 
     private String getLabel(OWLEntity entity, OWLOntology owlOntology) {
-       for (OWLAnnotation annotation:  entity.getAnnotations(owlOntology)) {
-           if (annotation.getProperty().isLabel())  {
-               return ( (OWLLiteral) annotation.getValue()).getLiteral().toString();
-           }
-       }
+        for (OWLAnnotation annotation:  entity.getAnnotations(owlOntology)) {
+            if (annotation.getProperty().isLabel())  {
+                return ( (OWLLiteral) annotation.getValue()).getLiteral().toString();
+            }
+        }
         return "no label";
     }
 
@@ -346,6 +389,7 @@ public class OntologyBuilder {
         roots.add(IRI.create("http://www.ebi.ac.uk/efo/EFO_0000001"));
         roots.add(IRI.create("http://www.geneontology.org/formats/oboInOwl#ObsoleteClass"));
         OntologyBuilder ontologyBuilder = new OntologyBuilder("efo", IRI.create("file:///Users/jupp/dev/java/efo3-creator/efo/src/efo-release-candidate.owl"), "/Users/jupp/dev/java/efo3-creator/efo/src", "/Users/jupp/dev/java/efo3-creator/efo/release", "http://www.ebi.ac.uk/efo", roots);
+//        ontologyBuilder.generateSlims();
         ontologyBuilder.generateRelease();
 //        OntologyBuilder ontologyBuilder = new OntologyBuilder("go", IRI.create("file:///Users/jupp/dev/ontologies/go/go-slimmer/go-metagenomics-slim.owl"), "/Users/jupp/dev/ontologies/go/go-slimmer", "/Users/jupp/dev/ontologies/go/go-slimmer/release", "http://purl.obolibrrary.org/obo/go", roots);
     }

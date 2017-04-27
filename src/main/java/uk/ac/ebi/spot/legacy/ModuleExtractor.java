@@ -27,7 +27,7 @@ public class ModuleExtractor {
         OWLDataFactory dataFactory = manager.getOWLDataFactory();
         for (OntologyConfiguration ontologyConfiguration : configurations) {
 
-            if (ontologyConfiguration.getShortName().equals("uberon")) {
+//            if (!ontologyConfiguration.getShortName().equals("ncbitaxon")) {
                 try {
 
 
@@ -44,8 +44,8 @@ public class ModuleExtractor {
                     SyntacticLocalityModuleExtractor moduleExtractor = new SyntacticLocalityModuleExtractor(manager, moduleOntology, ModuleType.TOP);
 
 
-                    owlAxioms = moduleExtractor.extract(signature);
-                    System.out.println(owlAxioms);
+                    owlAxioms.addAll(moduleExtractor.extract(signature));
+//                    System.out.println(owlAxioms);
 
                 }
                 catch (OWLOntologyCreationException e) {
@@ -54,7 +54,7 @@ public class ModuleExtractor {
 
             }
 
-        }
+//        }
 
 
 
