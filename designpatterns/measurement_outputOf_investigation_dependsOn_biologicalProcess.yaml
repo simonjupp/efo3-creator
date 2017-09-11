@@ -1,0 +1,33 @@
+pattern_name: measurement_outputOf_investigation_dependsOn_biologicalProcess
+
+classes:
+    measurement: EFO_0001444
+    investigation: OBI_0000066
+    biological process: GO_0008150
+    
+relations:
+    output of: RO_0002353
+    depends on: RO_0002502
+    
+vars:
+    measurement: "measurement"
+    investigation: "investigation"
+    process: "'biological process'"
+    
+comment:
+    text: "This design pattern is used to describe measurements relating to a biological process such as behavioural measurements"
+    
+    
+equivalentTo:
+    text: "%s and ('output of' some (%s and ('depends on' some %s)))"
+    vars:
+        - measurement
+        - investigation
+        - process
+        
+    
+subClassOf:
+    text: "'output of' some (%s and ('depends on' some %s))"
+    vars:
+        - investigation
+        - process

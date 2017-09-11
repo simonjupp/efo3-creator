@@ -1,0 +1,33 @@
+pattern_name: measurement_outputOf_investigation_occursIn_animalComponent
+
+classes:
+    measurement: EFO_0001444
+    investigation: OBI_0000066
+    animal component: EFO_0000787
+    
+relations:
+    output of: RO_0002353
+    occurs in: BFO_0000066
+    
+vars:
+    measurement: "measurement"
+    investigation: "investigation"
+    component: "'animal component'"
+    
+comment:
+    text: "This design pattern is used to describe measurements relating to a animal component, eg eye measurement occurs in some eye"
+    
+    
+equivalentTo:
+    text: "%s and ('output of' some (%s and ('occurs in' some %s)))"
+    vars:
+        - measurement
+        - investigation
+        - component
+        
+    
+subClassOf:
+    text: "'output of' some (%s and ('occurs in' some %s))"
+    vars:
+        - investigation
+        - component

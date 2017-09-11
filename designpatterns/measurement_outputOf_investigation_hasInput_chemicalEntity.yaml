@@ -1,0 +1,34 @@
+pattern_name: measurement_outputOf_investigation_hasInput_chemicalEntity
+
+classes:
+    measurement: EFO_0001444
+    investigation: OBI_0000066
+    chemical entity: CHEBI_24431
+    
+relations:
+    output of: RO_0002353
+    has input: RO_0002233
+    
+vars:
+    measurement: "measurement"
+    investigation: "investigation"
+    entity: "'chemical entity'"
+    
+comment:
+    text: "This design pattern is used to describe measurements of a chemical entity in a sample"
+    
+    
+equivalentTo:
+    text: "%s and ('output of' some (%s and ('has input' some %s)))"
+    vars:
+        - measurement
+        - investigation
+        - entity
+        
+    
+subClassOf:
+    text: "'output of' some (%s and ('has input' some %s))"
+    vars:
+        - investigation
+        - entity
+        
