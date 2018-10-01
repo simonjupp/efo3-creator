@@ -1,0 +1,29 @@
+pattern_name: phenotype_phenotypeOf_disease
+
+classes:
+    phenotye: EFO_0000651
+    disease: EFO_0000408
+    
+relations:
+    phenotype of: RO_0002233
+    
+vars:
+    response: "phenotye"
+    disease: "disease"
+    
+comment:
+    text: "This design pattern is used to link phenotype to diseases"
+    
+    
+equivalentTo:
+    text: "%s and ('phenotype of' some %s)"
+    vars:
+        - phenotype
+        - disease
+        
+    
+subClassOf:
+    text: "'phenotype of' some %s"
+    vars:
+        - disease
+        

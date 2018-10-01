@@ -1,0 +1,33 @@
+pattern_name: measurement_outputOf_investigation_dependsOn_phenotype
+
+classes:
+    measurement: EFO_0001444
+    investigation: OBI_0000066
+    phenotype: EFO_0000651
+    
+relations:
+    output of: RO_0002353
+    depends on: RO_0002502
+    
+vars:
+    measurement: "measurement"
+    investigation: "investigation"
+    phenotype: "phenotype"
+    
+comment:
+    text: "This design pattern is used to describe measurements relating to a phenotype"
+    
+    
+equivalentTo:
+    text: "%s and ('output of' some (%s and ('depends on' some %s)))"
+    vars:
+        - measurement
+        - investigation
+        - phenotype
+        
+    
+subClassOf:
+    text: "'output of' some (%s and ('depends on' some %s))"
+    vars:
+        - investigation
+        - phenotype

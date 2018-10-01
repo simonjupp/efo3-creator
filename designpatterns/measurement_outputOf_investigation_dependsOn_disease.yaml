@@ -1,0 +1,33 @@
+pattern_name: measurement_outputOf_investigation_dependsOn_disease
+
+classes:
+    measurement: EFO_0001444
+    investigation: OBI_0000066
+    disease: EFO_0000408
+    
+relations:
+    output of: RO_0002353
+    depends on: RO_0002502
+    
+vars:
+    measurement: "measurement"
+    investigation: "investigation"
+    disease: "disease"
+    
+comment:
+    text: "This design pattern is used to describe measurements relating to a disease"
+    
+    
+equivalentTo:
+    text: "%s and ('output of' some (%s and ('depends on' some %s)))"
+    vars:
+        - measurement
+        - investigation
+        - disease
+        
+    
+subClassOf:
+    text: "'output of' some (%s and ('depends on' some %s))"
+    vars:
+        - investigation
+        - disease

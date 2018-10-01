@@ -1,0 +1,29 @@
+pattern_name: responseToDrug_hasInput_chemicalEntity
+
+classes:
+    response to drug: GO_0042493
+    chemical entity: CHEBI_24431
+    
+relations:
+    has input: RO_0002233
+    
+vars:
+    response: "response to drug"
+    entity: "'chemical entity'"
+    
+comment:
+    text: "This design pattern is used to link drug responses to the chemical entity triggering the response"
+    
+    
+equivalentTo:
+    text: "%s and ('has input' some %s)"
+    vars:
+        - response
+        - entity
+        
+    
+subClassOf:
+    text: "'has input' some %s"
+    vars:
+        - entity
+        
