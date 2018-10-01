@@ -20,10 +20,11 @@ import java.util.*;
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  *
  *
- * GIven an ontology and a configuration file this class will go through the configuration files and look for terms matching each config.
+ * Given an ontology and a configuration file this class will go through the configuration files and look for terms matching each config.
  * The terms for each cofnig will be dumped into a text file in a folder named by the config
  *
  */
+@Deprecated
 public class TermDumper {
 
     private SimpleShortFormProvider simpleShortFormProvider = new SimpleShortFormProvider();

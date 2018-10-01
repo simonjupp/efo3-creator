@@ -12,6 +12,7 @@ import java.util.Set;
  * @date 06/01/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
+@Deprecated
 public class ConfigParser {
 
     public static Set<OntologyConfiguration> readConfig(File jsonData) {

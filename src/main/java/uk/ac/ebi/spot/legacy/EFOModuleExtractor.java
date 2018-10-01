@@ -9,6 +9,7 @@ import uk.ac.ebi.spot.ontobuilder.ConfigParser;
 import uk.ac.ebi.spot.ontobuilder.OntologyConfiguration;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
@@ -19,14 +20,17 @@ import java.util.*;
  * This class extracts all the individuals ontologies referenced in EFO out into individual files using a Full MIREOT from the source
  *
  */
+@Deprecated
 public class EFOModuleExtractor {
 
     Collection<OntologyConfiguration> ontologyConfigurations;
 
-    public EFOModuleExtractor(String configFile) {
+    public String baseDir;
+
+    public EFOModuleExtractor(String configFile, String baseDir) {
 
         ontologyConfigurations = ConfigParser.readConfig(new File(configFile));
-
+        this.baseDir = baseDir;
     }
 
     public void convert() {
@@ -59,10 +63,19 @@ public class EFOModuleExtractor {
             TermDumper termDumper = new TermDumper();
             for (OntologyConfiguration configuration : ontologyConfigurations) {
                 // we don't want to dump ordo - we are managing that list ourselves now
-                if (!configuration.getShortName().equals("ordo")) {
-                    termDumper.dumpTerms(merged, configuration);
-                }
+//                if (!configuration.getShortName().equals("ordo")) {
+                termDumper.dumpTerms(merged, configuration);
+//                }
             }
+
+            // OBO if EFO
+            // alternative_term -> obo exact synonym
+            // definition to ISA definition
+            // relation to OBO rels
+            // all xrefs -> dbxref
+            // all patterns -> OBO patterns
+            //
+
 
             // remove any non EFO axioms (i.e. axioms that come from an external ontology)
 
@@ -97,6 +110,9 @@ public class EFOModuleExtractor {
 //                System.out.println(change.toString());
 //            }
 
+            String fixesDirPath = baseDir + File.separator + "fixes";
+
+
             // remove any non EFO subclass axioms between named classes. subclasses we may have created
 
 
@@ -128,6 +144,28 @@ public class EFOModuleExtractor {
                 }
             }
 
+            // add new subclass axioms required for fixing
+
+            File newSubclassesFile = new File(fixesDirPath, "subClasses.txt");
+
+            try {
+                Scanner fileReader = new Scanner(newSubclassesFile);
+                while (fileReader.hasNext()) {
+                    String line = fileReader.nextLine();
+                    String []lineSplit = line.split("\\s+");
+                    String sub = lineSplit[0];
+                    String sup = lineSplit[1];
+                    OWLAxiom subclass= manager.getOWLDataFactory().getOWLSubClassOfAxiom(
+                            manager.getOWLDataFactory().getOWLClass(IRI.create(sub)),
+                            manager.getOWLDataFactory().getOWLClass(IRI.create(sup))
+                    );
+                    manager.applyChange(new AddAxiom(merged, subclass));
+                }
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            
             manager.applyChanges(axiomsToRemove);
             manager.saveOntology(merged, IRI.create("file:///Users/jupp/dev/java/efo3-creator/efo/src/efo-release-candidate.owl"));
 
@@ -144,7 +182,7 @@ public class EFOModuleExtractor {
     public static void main(String[] args) {
         System.setProperty("entityExpansionLimit", "100000000");
 
-        EFOModuleExtractor converter = new EFOModuleExtractor("/Users/jupp/dev/java/efo3-creator/efo/src/ontology-config.json");
+        EFOModuleExtractor converter = new EFOModuleExtractor("/Users/jupp/dev/java/efo3-creator/efo/src/ontology-config.json", "/Users/jupp/dev/java/efo3-creator/efo/src" );
         converter.convert();
     }
 

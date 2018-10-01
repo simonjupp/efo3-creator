@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.ontobuilder;
+package uk.ac.ebi.spot;
 
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -6,13 +6,12 @@ import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-
 /**
  * @author Simon Jupp
  * @date 18/01/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
+@Deprecated
 public class CompareOntologyAxioms {
     private Logger log = LoggerFactory.getLogger(getClass());
 

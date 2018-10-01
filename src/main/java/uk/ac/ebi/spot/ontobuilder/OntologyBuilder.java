@@ -14,6 +14,8 @@ import org.semanticweb.owlapi.util.OWLOntologyURIChanger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.spot.ModuleProfileExtractor;
+import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
+import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  * @date 06/01/2016
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
+@Deprecated
 public class OntologyBuilder {
 
     private Logger log = LoggerFactory.getLogger(getClass());
@@ -69,59 +72,12 @@ public class OntologyBuilder {
 
 
         log.info("Preparing release for " + name + "...");
-//        OWLOntology originalEFO;
-//
-//        try {
-//            // load all the latest EFO 3 sources
-//
-//            OWLOntologyManager oldManager = OWLManager.createOWLOntologyManager();
-//            oldManager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp//dev/ontologies/ExperimentalFactorOntology/ExFactorInOWL/releasecandidate/efoDiseaseAxioms.owl"));
-//            oldManager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp//dev/ontologies/ExperimentalFactorOntology/ExFactorInOWL/releasecandidate/efoordoaxioms.owl"));
-//            oldManager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp//dev/ontologies/ExperimentalFactorOntology/ExFactorInOWL/releasecandidate/efo_disease_module.owl"));
-//            oldManager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp//dev/ontologies/ExperimentalFactorOntology/ExFactorInOWL/releasecandidate/efo_ordo_module.owl"));
-//            oldManager.loadOntologyFromOntologyDocument(IRI.create("file:///Users/jupp//dev/ontologies/ExperimentalFactorOntology/ExFactorInOWL/releasecandidate/efo_release_candidate.owl"));
-//
-//
-//            // merge to create single ontology
-//            OWLOntologyMerger merger = new OWLOntologyMerger(oldManager);
-//            originalEFO = merger.createMergedOntology(oldManager, IRI.create("http://www.ebi.ac.uk/efo-tmp-merged")) ;
-//
-//        } catch (OWLOntologyCreationException e) {
-//            System.exit(1);
-//        }
-
-
-
 
         Collection<IRI> allSlimTerms = new HashSet<>();
         OWLOntology sourceOntology =   null;
         try {
             sourceOntology = manager.loadOntology(source);
         } catch (OWLOntologyCreationException e) {
-            e.printStackTrace();
-        }
-
-        String fixesDirPath = baseDir + File.separator + "fixes";
-
-        // add new subclass axioms required for fixing
-
-        File newSubclassesFile = new File(fixesDirPath, "subClasses.txt");
-
-        try {
-            Scanner fileReader = new Scanner(newSubclassesFile);
-            while (fileReader.hasNext()) {
-                String line = fileReader.nextLine();
-                String []lineSplit = line.split("\\s+");
-                String sub = lineSplit[0];
-                String sup = lineSplit[1];
-                OWLAxiom subclass= manager.getOWLDataFactory().getOWLSubClassOfAxiom(
-                        manager.getOWLDataFactory().getOWLClass(IRI.create(sub)),
-                        manager.getOWLDataFactory().getOWLClass(IRI.create(sup))
-                );
-                manager.applyChange(new AddAxiom(sourceOntology, subclass));
-            }
-
-        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -171,14 +127,14 @@ public class OntologyBuilder {
                                 manager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ebi.ac.uk/efo/EFO_0000508"))
                         );
                         manager.addAxiom(mergedOntology, subClassOfAxiom);
-//                        log.info("Adding Orphanet term back as sublass of genetic disorder");
+                        log.info("Adding Orphanet term back as sublass of genetic disorder");
                     } else if (cls.getIRI().getFragment().startsWith("UBERON_") && allSlimTerms.contains(cls.getIRI())) {
                         OWLSubClassOfAxiom subClassOfAxiom = manager.getOWLDataFactory().getOWLSubClassOfAxiom(
                                 manager.getOWLDataFactory().getOWLClass(cls.getIRI()),
                                 manager.getOWLDataFactory().getOWLClass(IRI.create("http://www.ebi.ac.uk/efo/EFO_0000787"))
                         );
                         manager.addAxiom(mergedOntology, subClassOfAxiom);
-//                        log.info("Adding UBERON term back as sublass of animal component");
+                        log.info("Adding UBERON term back as sublass of animal component");
                     }
                     else if (allSlimTerms.contains(cls.getIRI())){
                         log.warn("Removing a slim term: " + cls.getIRI());
@@ -241,7 +197,7 @@ public class OntologyBuilder {
 
                 // create modules from slim + ontology
                 log.info("Creating module for slim " + ontologyConfiguration.getShortName());
-                OWLOntology extractedModule = createModule(terms, iri, url);
+                OWLOntology extractedModule = createSyntacticModule(terms, iri, url);
 
                 // find any terms from slim that are no longer in the source ontology (i.e. have been deleted or obsoleted externally
                 missingTerms.put(ontologyConfiguration.getShortName(), new HashSet<>());
@@ -271,6 +227,7 @@ public class OntologyBuilder {
                 // save the file
                 File output = new File( ontoDir, ontologyConfiguration.getShortName() + ".owl");
                 extractedManager.saveOntology(extractedModule, IRI.create(output));
+                manager.removeOntology(extractedModule);
 //                manager.loadOntology(IRI.create(output));
 
                 log.info("Mireot created for " + ontologyConfiguration.getShortName() + " in " + output);
@@ -358,6 +315,72 @@ public class OntologyBuilder {
 
 
     }
+
+    public static OWLOntology createSyntacticModule (Set<IRI> signature, IRI iri, IRI location) {
+
+
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+        manager.setSilentMissingImportsHandling(true);
+
+        // merge ontologies into single ontology for module extraction
+        try {
+
+            OWLOntology moduleOntology = manager.loadOntology(location);
+
+            IRI mergedOntologyIri = IRI.create(iri.toString() + "-merged");
+
+            OWLOntologyMerger owlOntologyMerger = new OWLOntologyMerger(manager);
+            OWLOntology mergedOntology = owlOntologyMerger.createMergedOntology(manager,mergedOntologyIri );
+            if (iri.toString().contains("orphanet")) {
+
+                // swap part_of for is-a
+                Set<OWLAxiom> partOfAxioms = manager.getOntology(mergedOntologyIri).getReferencingAxioms(manager.getOWLDataFactory().getOWLObjectProperty(IRI.create("http://purl.obolibrary.org/obo/BFO_0000050")));
+
+                Set<OWLAxiom> axiomToRemove = new HashSet<>();
+                Set<OWLAxiom> axiomToAdd = new HashSet<>();
+                for (OWLAxiom ax : partOfAxioms) {
+                    if (ax instanceof OWLSubClassOfAxiom) {
+                        OWLSubClassOfAxiom partOfSomeAxiom = (OWLSubClassOfAxiom) ax;
+                        if (partOfSomeAxiom.getSuperClass() instanceof OWLObjectSomeValuesFrom) {
+                            OWLObjectSomeValuesFrom someRestriction = (OWLObjectSomeValuesFrom) partOfSomeAxiom.getSuperClass();
+                            if (someRestriction.getFiller() instanceof OWLClass) {
+                                axiomToRemove.add(ax);
+                                axiomToAdd.add(manager.getOWLDataFactory().getOWLSubClassOfAxiom(
+                                        partOfSomeAxiom.getSubClass().asOWLClass(),
+                                        someRestriction.getFiller().asOWLClass()
+                                ));
+                            }
+                        }
+                    }
+                }
+
+                manager.removeAxioms(mergedOntology, axiomToRemove);
+                manager.addAxioms(mergedOntology, axiomToAdd);
+
+
+            }
+
+            SyntacticLocalityModuleExtractor moduleExtractor = new SyntacticLocalityModuleExtractor(manager, mergedOntology, ModuleType.BOT);
+
+            Set<OWLEntity> owlEntities = new HashSet<>();
+            for (IRI iri1 : signature) {
+                owlEntities.add(manager.getOWLDataFactory().getOWLClass(iri1));
+            }
+            IRI moduleUri = IRI.create(iri.toString() + "-module");
+
+            return moduleExtractor.extractAsOntology(owlEntities, moduleUri);
+
+        } catch (OWLOntologyCreationException e) {
+            e.printStackTrace();
+            throw  new RuntimeException("Couldn't get module for " + iri, e);
+        } catch (Exception e) {
+            throw  new RuntimeException("Couldn't get module for " + iri, e);
+
+        }
+
+
+    }
+
     private Set<IRI> readTermsFromFile(String baseDir, String shortName) throws IOException {
 
         String path = baseDir + File.separator + "imported-terms" + File.separator + shortName + File.separator + shortName + ".txt";
@@ -389,7 +412,7 @@ public class OntologyBuilder {
         roots.add(IRI.create("http://www.ebi.ac.uk/efo/EFO_0000001"));
         roots.add(IRI.create("http://www.geneontology.org/formats/oboInOwl#ObsoleteClass"));
         OntologyBuilder ontologyBuilder = new OntologyBuilder("efo", IRI.create("file:///Users/jupp/dev/java/efo3-creator/efo/src/efo-release-candidate.owl"), "/Users/jupp/dev/java/efo3-creator/efo/src", "/Users/jupp/dev/java/efo3-creator/efo/release", "http://www.ebi.ac.uk/efo", roots);
-//        ontologyBuilder.generateSlims();
+        ontologyBuilder.generateSlims();
         ontologyBuilder.generateRelease();
 //        OntologyBuilder ontologyBuilder = new OntologyBuilder("go", IRI.create("file:///Users/jupp/dev/ontologies/go/go-slimmer/go-metagenomics-slim.owl"), "/Users/jupp/dev/ontologies/go/go-slimmer", "/Users/jupp/dev/ontologies/go/go-slimmer/release", "http://purl.obolibrrary.org/obo/go", roots);
     }
