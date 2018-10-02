@@ -5,9 +5,7 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.OWLEntityRenamer;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.System.exit;
 
@@ -50,6 +48,10 @@ public class MondoIdSwitcher {
                  OWLAnnotationProperty synonymProperty = factory.getOWLAnnotationProperty(IRI.create("http://www.geneontology.org/formats/oboInOwl#hasExactSynonym"));
 
                  OWLAnnotation mondoPreferredLabelAnnotation = factory.getOWLAnnotation(factory.getRDFSComment(), factory.getOWLLiteral("preferred label from MONDO"));
+
+                 Set<IRI> seenMondoIri = new HashSet<IRI>();
+                 Set<IRI> seenEfoIri = new HashSet<IRI>();
+
                  try {
 
                      br = new BufferedReader(new FileReader(csvFile));
@@ -59,62 +61,79 @@ public class MondoIdSwitcher {
                          String[] mappings = line.split(cvsSplitBy);
                          IRI mondoIri = IRI.create(mappings[0]) ;
 
+                         seenMondoIri.add(mondoIri);
+                         seenMondoIri.add(mondoIri);
                          if (!ontology.containsClassInSignature(mondoIri)) {
-                             System.err.println("WARNING: The MONDO iri " +  mondoIri.toString() + " can't be found but it is mapped to an EFO term");
-                         }
 
-                         String mondoCurie =  mondoIri.toString().substring(mondoIri.toString().lastIndexOf("/")+1).replace("_", ":");
+                             if (seenMondoIri.contains(mondoIri)) {
+                                 System.err.println("WARNING: The MONDO iri " +  mondoIri.toString() + " is duplicated in the mapping file");
+                             }   else {
+                                 System.err.println("WARNING: The MONDO iri " +  mondoIri.toString() + " can't be found but it is mapped to an EFO term");
+                             }
 
-                         IRI efo_iri = IRI.create(mappings[1]) ;
-                         List<OWLOntologyChange> change = renamer.changeIRI(mondoIri, efo_iri);
-                         ontology.getOWLOntologyManager().applyChanges(change);
+                         } else {
 
-                         List<RemoveAxiom> toRemove = new ArrayList<>();
+                             String mondoCurie =  mondoIri.toString().substring(mondoIri.toString().lastIndexOf("/")+1).replace("_", ":");
 
-                         // set the label to an alternate label
-                         for (OWLAnnotationAssertionAxiom axiom : factory.getOWLClass(efo_iri).getAnnotationAssertionAxioms(ontology)) {
-                             if (axiom.getProperty().equals(factory.getRDFSLabel())) {
+                             IRI efoIri = IRI.create(mappings[1]) ;
+                             if (!seenEfoIri.contains(efoIri)) {
+                                 seenEfoIri.add(efoIri);
+                             } else {
+                                 System.err.println("WARNING: EFO iri " +  efoIri.toString() + " is duplicated in the mapping file");
+                             }
 
-                                 toRemove.add(new RemoveAxiom(ontology, axiom));
+                             List<OWLOntologyChange> change = renamer.changeIRI(mondoIri, efoIri);
+                             ontology.getOWLOntologyManager().applyChanges(change);
 
-                                 OWLAnnotationAssertionAxiom newAxiom = manager.getOWLDataFactory().getOWLAnnotationAssertionAxiom(
-                                    synonymProperty,
-                                    efo_iri,
-                                    axiom.getValue(),
-                                    Collections.singleton(mondoPreferredLabelAnnotation)
-                                 );
-                                 ontology.getOWLOntologyManager().applyChange(new AddAxiom(ontology, newAxiom));
+                             List<RemoveAxiom> toRemove = new ArrayList<>();
+
+                             // set the label to an alternate label
+                             for (OWLAnnotationAssertionAxiom axiom : factory.getOWLClass(efoIri).getAnnotationAssertionAxioms(ontology)) {
+                                 if (axiom.getProperty().equals(factory.getRDFSLabel())) {
+
+                                     toRemove.add(new RemoveAxiom(ontology, axiom));
+
+                                     OWLAnnotationAssertionAxiom newAxiom = manager.getOWLDataFactory().getOWLAnnotationAssertionAxiom(
+                                        synonymProperty,
+                                        efoIri,
+                                        axiom.getValue(),
+                                        Collections.singleton(mondoPreferredLabelAnnotation)
+                                     );
+                                     ontology.getOWLOntologyManager().applyChange(new AddAxiom(ontology, newAxiom));
+                                 }
+
+
                              }
 
 
-                         }
+                             // set the id
+                             for (OWLAnnotationAssertionAxiom axiom : factory.getOWLClass(efoIri).getAnnotationAssertionAxioms(ontology)) {
 
+                                 if (axiom.getProperty().equals(idProperty)) {
+                                     String newId = efoIri.toString().substring(efoIri.toString().lastIndexOf("/")+1).replace("_", ":");
 
-                         // set the id
-                         for (OWLAnnotationAssertionAxiom axiom : factory.getOWLClass(efo_iri).getAnnotationAssertionAxioms(ontology)) {
+                                     toRemove.add(new RemoveAxiom(ontology, axiom));
 
-                             if (axiom.getProperty().equals(idProperty)) {
-                                 String newId = efo_iri.toString().substring(efo_iri.toString().lastIndexOf("/")+1).replace("_", ":");
+                                     OWLAnnotationAssertionAxiom newAxiom = manager.getOWLDataFactory().getOWLAnnotationAssertionAxiom(
+                                        idProperty,
+                                        efoIri,
+                                        factory.getOWLLiteral(newId)
+                                     );
+                                     ontology.getOWLOntologyManager().applyChange(new AddAxiom(ontology, newAxiom));
 
-                                 toRemove.add(new RemoveAxiom(ontology, axiom));
-
-                                 OWLAnnotationAssertionAxiom newAxiom = manager.getOWLDataFactory().getOWLAnnotationAssertionAxiom(
-                                    idProperty,
-                                    efo_iri,
-                                    factory.getOWLLiteral(newId)
-                                 );
-                                 ontology.getOWLOntologyManager().applyChange(new AddAxiom(ontology, newAxiom));
-                                 
+                                 }
                              }
-                         }
-                         ontology.getOWLOntologyManager().applyChanges(toRemove);
+                             ontology.getOWLOntologyManager().applyChanges(toRemove);
 
-                         // set the MONDO id as an xref
-                         OWLAnnotationAssertionAxiom newXrefAxiom = manager.getOWLDataFactory().getOWLAnnotationAssertionAxiom(
-                                xrefProperty,
-                                efo_iri,
-                                factory.getOWLLiteral(mondoCurie)
-                         );
+                             // set the MONDO id as an xref
+                             OWLAnnotationAssertionAxiom newXrefAxiom = manager.getOWLDataFactory().getOWLAnnotationAssertionAxiom(
+                                    xrefProperty,
+                                    efoIri,
+                                    factory.getOWLLiteral(mondoCurie)
+                             );
+                             ontology.getOWLOntologyManager().applyChange(new AddAxiom(ontology, newXrefAxiom));
+                         }
+
 
 
                      }
