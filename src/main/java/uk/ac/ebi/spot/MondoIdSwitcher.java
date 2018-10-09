@@ -76,6 +76,8 @@ public class MondoIdSwitcher {
                              String mondoCurie =  mondoIri.toString().substring(mondoIri.toString().lastIndexOf("/")+1).replace("_", ":");
 
                              IRI efoIri = IRI.create(mappings[1]) ;
+                             String efoCurie =  efoIri.toString().substring(efoIri.toString().lastIndexOf("/")+1).replace("_", ":");
+
                              if (!seenEfoIri.contains(efoIri)) {
                                  seenEfoIri.add(efoIri);
                              } else {
@@ -124,14 +126,30 @@ public class MondoIdSwitcher {
                                  }
                              }
                              ontology.getOWLOntologyManager().applyChanges(toRemove);
+                             toRemove.clear();
 
                              // set the MONDO id as an xref
-                             OWLAnnotationAssertionAxiom newXrefAxiom = manager.getOWLDataFactory().getOWLAnnotationAssertionAxiom(
-                                    xrefProperty,
-                                    efoIri,
-                                    factory.getOWLLiteral(mondoCurie)
-                             );
-                             ontology.getOWLOntologyManager().applyChange(new AddAxiom(ontology, newXrefAxiom));
+                             for (OWLAnnotationAssertionAxiom axiom : factory.getOWLClass(efoIri).getAnnotationAssertionAxioms(ontology)) {
+
+                                 if (axiom.getProperty().equals(xrefProperty)) {
+                                     if (axiom.getValue() instanceof OWLLiteral)  {
+
+                                         OWLLiteral literalId = (OWLLiteral) axiom.getValue();
+                                         if (literalId.getLiteral().equals(efoCurie))  {
+
+                                             toRemove.add(new RemoveAxiom(ontology, axiom));
+                                             OWLAnnotationAssertionAxiom newXrefAxiom = manager.getOWLDataFactory().getOWLAnnotationAssertionAxiom(
+                                                    xrefProperty,
+                                                    efoIri,
+                                                    factory.getOWLLiteral(mondoCurie)
+                                             );
+                                             ontology.getOWLOntologyManager().applyChange(new AddAxiom(ontology, newXrefAxiom));
+                                         }
+                                     }
+
+                                 }
+                             }
+                             ontology.getOWLOntologyManager().applyChanges(toRemove);
                          }
 
 
